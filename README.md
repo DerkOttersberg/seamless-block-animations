@@ -1,6 +1,6 @@
-# Fancy Door Anim Rebuild
+# Fresh interactiable animations
 
-Smooth, animated door opening for Fabric 1.21.11.
+Animated door opening and closing for Fabric 1.21.11.
 
 ![Open Door Animation](opendoor.gif)
 

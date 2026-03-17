@@ -22,7 +22,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"smooth-doors" {
+		"fresh-interactiable-animations" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
