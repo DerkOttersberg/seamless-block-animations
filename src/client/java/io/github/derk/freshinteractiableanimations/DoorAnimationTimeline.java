@@ -162,7 +162,9 @@ public final class DoorAnimationTimeline {
             this.closedState = closedState;
 
             long finishAt = startedAtNanos + TRANSITION_LENGTH_NANOS;
-            long revealLead = Math.min(REVEAL_LEAD_TIME_NANOS, Math.max(0L, TRANSITION_LENGTH_NANOS - 1000000L));
+            long revealLead = kind == AnimatedBlockSnapshot.Kind.FENCE_GATE
+                ? 0L
+                : Math.min(REVEAL_LEAD_TIME_NANOS, Math.max(0L, TRANSITION_LENGTH_NANOS - 1000000L));
             this.hiddenUntilNanos = Math.max(startedAtNanos, finishAt - revealLead);
             this.revealed = false;
         }

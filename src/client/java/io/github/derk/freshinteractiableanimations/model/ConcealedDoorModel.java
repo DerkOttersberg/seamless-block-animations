@@ -23,6 +23,9 @@ import java.util.function.Predicate;
 
 @Environment(EnvType.CLIENT)
 public final class ConcealedDoorModel extends WrapperBlockStateModel implements FabricBlockStateModel {
+    private static final float OUTER_POST_BAND = 0.125f;
+    private static final float POSITION_EPSILON = 0.0001f;
+
     public ConcealedDoorModel(BlockStateModel delegate) {
         super(delegate);
     }
@@ -37,6 +40,7 @@ public final class ConcealedDoorModel extends WrapperBlockStateModel implements 
             }
 
             if (DoorAnimationTimeline.shouldSuppressAnimatedModel(pos, state)) {
+                emitFilteredFenceGateQuads(emitter, blockView, pos, state, random, cullTest, AnimatedModelRenderContext.FenceGateQuadMode.POSTS_ONLY);
                 return;
             }
         }
@@ -60,6 +64,7 @@ public final class ConcealedDoorModel extends WrapperBlockStateModel implements 
     private static boolean shouldKeepFenceGateQuad(QuadView quad, BlockState state, AnimatedModelRenderContext.FenceGateQuadMode mode) {
         FenceGateQuadRegion region = classifyFenceGateQuad(quad, state);
         return switch (mode) {
+            case POSTS_ONLY -> region == FenceGateQuadRegion.POSTS;
             case LOW_LEAF_ONLY -> region == FenceGateQuadRegion.LOW_LEAF;
             case HIGH_LEAF_ONLY -> region == FenceGateQuadRegion.HIGH_LEAF;
             case DEFAULT -> true;
@@ -82,11 +87,16 @@ public final class ConcealedDoorModel extends WrapperBlockStateModel implements 
         boolean alongX = state.get(Properties.HORIZONTAL_FACING).getAxis() == Direction.Axis.Z;
         float minSpan = alongX ? minX : minZ;
         float maxSpan = alongX ? maxX : maxZ;
+        if (maxSpan <= OUTER_POST_BAND + POSITION_EPSILON || minSpan >= 1.0f - OUTER_POST_BAND - POSITION_EPSILON) {
+            return FenceGateQuadRegion.POSTS;
+        }
+
         float midpoint = (minSpan + maxSpan) * 0.5f;
         return midpoint < 0.5f ? FenceGateQuadRegion.LOW_LEAF : FenceGateQuadRegion.HIGH_LEAF;
     }
 
     private enum FenceGateQuadRegion {
+        POSTS,
         LOW_LEAF,
         HIGH_LEAF
     }

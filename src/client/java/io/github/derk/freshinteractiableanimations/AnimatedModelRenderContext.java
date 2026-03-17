@@ -27,6 +27,7 @@ public final class AnimatedModelRenderContext {
     @Environment(EnvType.CLIENT)
     public enum FenceGateQuadMode {
         DEFAULT,
+        POSTS_ONLY,
         LOW_LEAF_ONLY,
         HIGH_LEAF_ONLY
     }

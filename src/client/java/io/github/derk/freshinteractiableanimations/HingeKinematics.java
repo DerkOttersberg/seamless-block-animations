@@ -79,10 +79,12 @@ public final class HingeKinematics {
             default -> 1.0f;
         };
         float degrees = FULL_SWING_DEGREES * progress * (lowLeaf ? lowLeafDirection : -lowLeafDirection);
+        float outerPostCenter = 1.0f / 16.0f;
+        float oppositePostCenter = 15.0f / 16.0f;
 
         return switch (facing.getAxis()) {
-            case Z -> new FenceGateLeafMotion(lowLeaf ? 0.125f : 0.875f, 0.5f, degrees);
-            case X -> new FenceGateLeafMotion(0.5f, lowLeaf ? 0.125f : 0.875f, degrees);
+            case Z -> new FenceGateLeafMotion(lowLeaf ? outerPostCenter : oppositePostCenter, 0.5f, degrees);
+            case X -> new FenceGateLeafMotion(0.5f, lowLeaf ? outerPostCenter : oppositePostCenter, degrees);
             default -> new FenceGateLeafMotion(0.5f, 0.5f, 0.0f);
         };
     }
