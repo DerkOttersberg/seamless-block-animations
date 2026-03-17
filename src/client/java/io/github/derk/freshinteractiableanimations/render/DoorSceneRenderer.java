@@ -1,5 +1,6 @@
 package io.github.derk.freshinteractiableanimations.render;
 
+import io.github.derk.freshinteractiableanimations.AnimatedModelRenderContext;
 import io.github.derk.freshinteractiableanimations.DoorAnimationTimeline;
 import io.github.derk.freshinteractiableanimations.HingeKinematics;
 import net.fabricmc.api.EnvType;
@@ -116,23 +117,33 @@ public final class DoorSceneRenderer {
         }
 
         BlockState closedState = slice.closedState;
-        float currentAngle = HingeKinematics.sampleFenceGateAngleDegrees(closedState.get(Properties.HORIZONTAL_FACING), slice.opening, progress);
+        Direction facing = closedState.get(Properties.HORIZONTAL_FACING);
 
-        matrices.push();
+        drawFenceGateLeaf(world, renderer, consumers, matrices, cameraPosition, pos, closedState, HingeKinematics.describeFenceGateLeafMotion(facing, true, progress), AnimatedModelRenderContext.FenceGateQuadMode.LOW_LEAF_ONLY);
+        drawFenceGateLeaf(world, renderer, consumers, matrices, cameraPosition, pos, closedState, HingeKinematics.describeFenceGateLeafMotion(facing, false, progress), AnimatedModelRenderContext.FenceGateQuadMode.HIGH_LEAF_ONLY);
+    }
 
-        Vec3d translated = new Vec3d(pos.getX() - cameraPosition.x, pos.getY() - cameraPosition.y, pos.getZ() - cameraPosition.z);
-        Vec3d bias = biasTowardCamera(cameraPosition, pos);
-        matrices.translate(translated.x + bias.x, translated.y, translated.z + bias.z);
-        matrices.translate(0.5, 0.0, 0.5);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(currentAngle));
-        matrices.translate(-0.5, 0.0, -0.5);
-
+    private static void drawFenceGateLeaf(ClientWorld world, BlockRenderManager renderer, VertexConsumerProvider consumers, MatrixStack matrices, Vec3d cameraPosition, BlockPos pos, BlockState closedState, HingeKinematics.FenceGateLeafMotion motion, AnimatedModelRenderContext.FenceGateQuadMode mode) {
+        AnimatedModelRenderContext.FenceGateQuadMode previousMode = AnimatedModelRenderContext.pushFenceGateMode(mode);
         try {
-            renderer.renderBlockAsEntity(closedState, matrices, consumers, WorldRenderer.getLightmapCoordinates(world, pos), OverlayTexture.DEFAULT_UV);
-        } catch (RuntimeException ignored) {
-        }
+            matrices.push();
 
-        matrices.pop();
+            Vec3d translated = new Vec3d(pos.getX() - cameraPosition.x, pos.getY() - cameraPosition.y, pos.getZ() - cameraPosition.z);
+            Vec3d bias = biasTowardCamera(cameraPosition, pos);
+            matrices.translate(translated.x + bias.x, translated.y, translated.z + bias.z);
+            matrices.translate(motion.pivotX(), 0.0, motion.pivotZ());
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(motion.degrees()));
+            matrices.translate(-motion.pivotX(), 0.0, -motion.pivotZ());
+
+            try {
+                renderer.renderBlockAsEntity(closedState, matrices, consumers, WorldRenderer.getLightmapCoordinates(world, pos), OverlayTexture.DEFAULT_UV);
+            } catch (RuntimeException ignored) {
+            }
+
+            matrices.pop();
+        } finally {
+            AnimatedModelRenderContext.restoreFenceGateMode(previousMode);
+        }
     }
 
     private static void drawSingleLeaf(BlockRenderView world, BlockRenderManager renderer, VertexConsumerProvider consumers, MatrixStack matrices, Vec3d cameraPosition, BlockPos pos, BlockState closedState, float angleDegrees, DoorAnimationTimeline.MotionSlice slice) {

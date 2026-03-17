@@ -72,6 +72,21 @@ public final class HingeKinematics {
         return FULL_SWING_DEGREES * direction * progress;
     }
 
+    public static FenceGateLeafMotion describeFenceGateLeafMotion(Direction facing, boolean lowLeaf, float progress) {
+        float lowLeafDirection = switch (facing) {
+            case NORTH, EAST -> 1.0f;
+            case SOUTH, WEST -> -1.0f;
+            default -> 1.0f;
+        };
+        float degrees = FULL_SWING_DEGREES * progress * (lowLeaf ? lowLeafDirection : -lowLeafDirection);
+
+        return switch (facing.getAxis()) {
+            case Z -> new FenceGateLeafMotion(lowLeaf ? 0.125f : 0.875f, 0.5f, degrees);
+            case X -> new FenceGateLeafMotion(0.5f, lowLeaf ? 0.125f : 0.875f, degrees);
+            default -> new FenceGateLeafMotion(0.5f, 0.5f, 0.0f);
+        };
+    }
+
     public static TrapdoorPose describeTrapdoorPose(Direction facing, BlockHalf half, float progress) {
         float angleMagnitude = FULL_SWING_DEGREES * progress;
         float radians = (float) Math.toRadians(angleMagnitude);
@@ -103,6 +118,10 @@ public final class HingeKinematics {
     public enum Axis {
         X,
         Z
+    }
+
+    @Environment(EnvType.CLIENT)
+    public record FenceGateLeafMotion(float pivotX, float pivotZ, float degrees) {
     }
 
     @Environment(EnvType.CLIENT)

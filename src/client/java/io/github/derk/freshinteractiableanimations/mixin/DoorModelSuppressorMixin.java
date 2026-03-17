@@ -5,6 +5,7 @@ import io.github.derk.freshinteractiableanimations.DoorAnimationTimeline;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FenceGateBlock;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,6 +23,10 @@ import java.util.List;
 public final class DoorModelSuppressorMixin {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void freshInteractiableAnimations$suppressTrackedDoorModel(BlockRenderView world, List<?> parts, BlockState state, BlockPos pos, MatrixStack matrices, VertexConsumer vertexConsumer, boolean cull, int overlay, CallbackInfo ci) {
+        if (state.getBlock() instanceof FenceGateBlock) {
+            return;
+        }
+
         if (AnimatedBlockSnapshot.supports(state) && DoorAnimationTimeline.shouldSuppressAnimatedModel(pos, state)) {
             ci.cancel();
         }
