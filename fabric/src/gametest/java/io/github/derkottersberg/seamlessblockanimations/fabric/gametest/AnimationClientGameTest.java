@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import io.github.derkottersberg.seamlessblockanimations.animation.AnimationTimeline;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -48,7 +49,34 @@ public final class AnimationClientGameTest implements FabricClientGameTest {
             context.waitTicks(8);
             assertRunningTransitions(context, 0);
             context.takeScreenshot("seamless-block-animations-closed-after-reversal");
+
+            if (Boolean.getBoolean("seamless.suiteTest")) {
+                captureMeteorShowerAfterResourceReload(context, singleplayer);
+            }
         }
+    }
+
+    private static void captureMeteorShowerAfterResourceReload(
+            ClientGameTestContext context,
+            TestSingleplayerContext singleplayer) {
+        singleplayer.getServer().runCommand("/time set midnight");
+        singleplayer.getServer().runCommand("/tp @a 0.5 101 -6.5 facing 0.5 350 700.0");
+        singleplayer.getServer().runCommand("/prettymeteors start large");
+        singleplayer.getConnection().waitForClientboundPackets();
+
+        // Let the deterministic client scheduler populate a representative wide field.
+        context.waitTicks(100);
+        context.takeScreenshot("pretty-meteors-wide-shower");
+
+        CompletableFuture<Void> reload = context.computeOnClient(client -> client.reloadResourcePacks());
+        context.waitFor(client -> reload.isDone());
+        reload.join();
+        singleplayer.getConnection().waitForClientboundPackets();
+        context.waitTicks(40);
+        context.takeScreenshot("pretty-meteors-after-resource-reload");
+
+        singleplayer.getServer().runCommand("/prettymeteors stop");
+        singleplayer.getConnection().waitForClientboundPackets();
     }
 
     private static void assertRequestedGraphicsBackend() {
