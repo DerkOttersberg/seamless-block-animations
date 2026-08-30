@@ -23,10 +23,10 @@ dependencies {
 }
 
 def suiteFabricJars = [
-    file("${rootProject.projectDir}/../Seamless-API/fabric/build/libs/seamless-api-${project.version}-fabric.jar"),
+    file("${rootProject.projectDir}/../seamless-api/fabric/build/libs/seamless-api-${project.version}-fabric.jar"),
     file("${rootProject.projectDir}/../pretty-meteors-with-trails/fabric/build/libs/pretty-meteors-with-trails-${project.version}-fabric.jar"),
     file("${rootProject.projectDir}/../seamless-deconstructing-workbench/fabric/build/libs/seamless-deconstructing-workbench-${project.version}-fabric.jar"),
-    file("${rootProject.projectDir}/../Seamless-Crafting/fabric/build/libs/seamless-crafting-${project.version}-fabric.jar")
+    file("${rootProject.projectDir}/../seamless-crafting/fabric/build/libs/seamless-crafting-${project.version}-fabric.jar")
 ]
 
 def stageSuiteClientGameTestMods = tasks.register('stageSuiteClientGameTestMods', Copy) {
