@@ -21,6 +21,7 @@ For a future Minecraft line:
 3. Verify both client block-update paths. Normal server packets may bypass the public `ClientLevel.setBlock` override.
 4. Compile and boot each loader independently.
 5. Run `clean check build` and `:fabric:runClientGameTest`.
-6. Inspect all four client screenshots, then test both OpenGL and Vulkan in the combined mod suite.
+6. Build the other four sibling repositories, then run `:fabric:runClientGameTest -PsuiteTest=true` once with `-PgraphicsBackend=opengl` and once with `-PgraphicsBackend=vulkan`.
+7. Inspect all four client screenshots from both backends, then boot the combined Forge and NeoForge profiles under both backends. NeoForge's OpenGL early loading window must be disabled in `config/fml.toml` for Vulkan startup.
 
 The root verification tasks reject loader imports in `common` and reject jars containing another loader's metadata.

@@ -1,11 +1,15 @@
 package io.github.derkottersberg.seamlessblockanimations.fabric.gametest;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.derkottersberg.seamlessblockanimations.animation.AnimationTimeline;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -17,6 +21,8 @@ public final class AnimationClientGameTest implements FabricClientGameTest {
 
     @Override
     public void runTest(ClientGameTestContext context) {
+        assertCombinedSuiteLoaded();
+        assertRequestedGraphicsBackend();
         try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {
             arrangeWorld(singleplayer);
             singleplayer.getConnection().waitForChunksRender();
@@ -42,6 +48,34 @@ public final class AnimationClientGameTest implements FabricClientGameTest {
             context.waitTicks(8);
             assertRunningTransitions(context, 0);
             context.takeScreenshot("seamless-block-animations-closed-after-reversal");
+        }
+    }
+
+    private static void assertRequestedGraphicsBackend() {
+        if (!Boolean.getBoolean("seamless.vulkanTest")) {
+            return;
+        }
+
+        String backend = RenderSystem.getDevice().getDeviceInfo().backendName();
+        if (!backend.toLowerCase(Locale.ROOT).contains("vulkan")) {
+            throw new AssertionError("Vulkan was requested, but Minecraft selected: " + backend);
+        }
+    }
+
+    private static void assertCombinedSuiteLoaded() {
+        if (!Boolean.getBoolean("seamless.suiteTest")) {
+            return;
+        }
+
+        List<String> missing = List.of(
+            "seamlessapi",
+            "prettymeteors",
+            "seamlessdeconstructor",
+            "seamless_crafting",
+            "seamless_block_animations"
+        ).stream().filter(id -> !FabricLoader.getInstance().isModLoaded(id)).toList();
+        if (!missing.isEmpty()) {
+            throw new AssertionError("Combined suite is missing Fabric mods: " + missing);
         }
     }
 

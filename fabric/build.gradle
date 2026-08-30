@@ -21,6 +21,52 @@ fabricApi {
 dependencies {
     gametestImplementation project(':common')
 }
+
+def suiteFabricJars = [
+    file("${rootProject.projectDir}/../Seamless-API/fabric/build/libs/seamless-api-${project.version}-fabric.jar"),
+    file("${rootProject.projectDir}/../pretty-meteors-with-trails/fabric/build/libs/pretty-meteors-with-trails-${project.version}-fabric.jar"),
+    file("${rootProject.projectDir}/../seamless-deconstructing-workbench/fabric/build/libs/seamless-deconstructing-workbench-${project.version}-fabric.jar"),
+    file("${rootProject.projectDir}/../Seamless-Crafting/fabric/build/libs/seamless-crafting-${project.version}-fabric.jar")
+]
+
+def stageSuiteClientGameTestMods = tasks.register('stageSuiteClientGameTestMods', Copy) {
+    group = 'verification'
+    description = 'Stages the other four Seamless Suite Fabric jars for the combined client GameTest.'
+    dependsOn tasks.named('deleteGameTestRunDir')
+    from suiteFabricJars
+    into layout.buildDirectory.dir('run/clientGameTest/mods')
+    doFirst {
+        def missing = suiteFabricJars.findAll { !it.isFile() }
+        if (!missing.isEmpty()) {
+            throw new GradleException("Build the sibling Seamless Suite repositories first; missing:\n${missing.join('\n')}")
+        }
+    }
+}
+
+if (providers.gradleProperty('suiteTest').map { it.toBoolean() }.getOrElse(false)) {
+    tasks.named('runClientGameTest') {
+        dependsOn stageSuiteClientGameTestMods
+        jvmArgs '-Dseamless.suiteTest=true'
+    }
+}
+
+def requestedGraphicsBackend = providers.gradleProperty('graphicsBackend').getOrElse('default')
+if (requestedGraphicsBackend == 'vulkan') {
+    def stageVulkanClientGameTestOptions = tasks.register('stageVulkanClientGameTestOptions', Copy) {
+        group = 'verification'
+        description = 'Selects Vulkan in the disposable client GameTest profile.'
+        dependsOn tasks.named('deleteGameTestRunDir')
+        from layout.projectDirectory.file('qa/vulkan-options.txt')
+        into layout.buildDirectory.dir('run/clientGameTest')
+        rename 'vulkan-options.txt', 'options.txt'
+    }
+    tasks.named('runClientGameTest') {
+        dependsOn stageVulkanClientGameTestOptions
+        jvmArgs '-Dseamless.vulkanTest=true'
+    }
+} else if (requestedGraphicsBackend != 'default' && requestedGraphicsBackend != 'opengl') {
+    throw new GradleException("Unsupported graphicsBackend '${requestedGraphicsBackend}'; use opengl or vulkan")
+}
 def metadataVersion = project.version.toString()
 processResources {
     inputs.property 'version', metadataVersion

@@ -51,6 +51,17 @@ The loader jars are written to `fabric/build/libs`, `forge/build/libs`, and `neo
 
 Screenshots are written to `fabric/build/run/clientGameTest/screenshots`.
 
+When all five Seamless Suite repositories are checked out as siblings and their Fabric jars have been built, run the same interaction test with the entire suite loaded:
+
+```text
+./gradlew :fabric:runClientGameTest -PsuiteTest=true -PgraphicsBackend=opengl
+./gradlew :fabric:runClientGameTest -PsuiteTest=true -PgraphicsBackend=vulkan
+```
+
+Suite mode asserts that all five compatibility IDs are present. Vulkan mode also asserts Minecraft's live device backend, so an OpenGL fallback fails the test.
+
+NeoForge 26.2.0.75's early loading screen creates an OpenGL-owned window. Disable it with `earlyWindowControl = false` in the generated `config/fml.toml` before selecting Vulkan; otherwise NeoForge cannot hand that window to Minecraft's Vulkan surface. This is a loader startup constraint and does not affect the mod's renderer.
+
 See [PORTING.md](PORTING.md) for the module boundaries and [MIGRATION.md](MIGRATION.md) for compatibility details.
 
 ## License
