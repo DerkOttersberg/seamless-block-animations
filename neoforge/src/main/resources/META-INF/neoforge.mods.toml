@@ -1,0 +1,33 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="CC0-1.0"
+issueTrackerURL="https://github.com/DerkOttersberg/Seamless-block-animations/issues"
+
+[[mods]]
+modId="seamless_block_animations"
+version="${mod_version}"
+displayName="Seamless Block Animations"
+displayURL="https://github.com/DerkOttersberg/Seamless-block-animations"
+iconFile="assets/seamless_block_animations/icon.png"
+authors="Derk Ottersberg"
+description='''Smooth client-side door, trapdoor, and fence-gate animations using resource-pack models.'''
+
+[[mixins]]
+config="seamless_block_animations.mixins.json"
+
+[[dependencies.seamless_block_animations]]
+modId="neoforge"
+type="required"
+versionRange="${neo_version_range}"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.seamless_block_animations]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="CLIENT"
+
+[features.seamless_block_animations]
+javaVersion="[25,)"

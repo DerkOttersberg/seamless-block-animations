@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "io.github.derkottersberg.seamlessblockanimations.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "BlockModelRenderStateAccessor",
+    "ClientLevelMixin",
+    "LevelRendererMixin",
+    "ModelBlockRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

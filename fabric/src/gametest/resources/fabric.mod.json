@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "seamless-block-animations-gametest",
+  "version": "1.0.0",
+  "name": "Seamless Block Animations Client GameTests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "io.github.derkottersberg.seamlessblockanimations.fabric.gametest.AnimationClientGameTest"
+    ]
+  },
+  "depends": {
+    "seamless_block_animations": "*",
+    "fabric-client-gametest-api-v1": "*"
+  }
+}

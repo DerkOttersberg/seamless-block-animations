@@ -1,52 +1,58 @@
-# Fresh interactiable animations
+# Seamless Block Animations
 
-Fresh interactiable animations is a client-side Fabric mod for Minecraft 1.21.11 that adds smooth open and close animations to several vanilla interactive blocks while keeping normal gameplay behavior intact.
+Seamless Block Animations is a client-only Minecraft 26.2 mod that gives vanilla doors, trapdoors, and fence gates smooth open/close motion. One shared implementation is released for Fabric, Forge, and NeoForge.
 
-![Open Door Animation](opendoor.gif)
+![Door animation](opendoor.gif)
 
 ## Features
-- Smooth opening and closing animations for vanilla doors
-- Smooth opening and closing animations for vanilla trapdoors
-- Smooth opening and closing animations for vanilla fence gates
-- Client-side only behavior
-- Works with Fabric on Minecraft 1.21.11
-- Designed to stay compatible with resource packs by using the baked block models already provided by the game
-- Lightweight rendering approach with no gameplay changes, no new blocks, and no server-side requirement
 
-## Supported blocks
-- All vanilla doors
-- All vanilla trapdoors
-- All vanilla fence gates
-
-## How it works
-- Doors are hidden briefly and re-rendered with a smooth swing animation
-- Trapdoors use a contained animation path so the panel stays visually inside the block space while moving into the open pose
-- Fence gates animate their moving halves while preserving the overall vanilla model layout
-- The mod only changes visuals on the client and does not change block states, timings, or redstone behavior on the server
+- Smooth motion for every vanilla door, trapdoor, and fence gate.
+- Rapid direction changes continue from the current angle instead of snapping.
+- Vanilla baked models remain the source of the animated geometry, including models supplied by resource packs.
+- No blocks, registry entries, packets, server logic, or gameplay rules are added.
+- Uses Minecraft's render submission pipeline and does not call raw OpenGL, so the renderer is suitable for both OpenGL and Vulkan backends.
 
 ## Requirements
-- Minecraft 1.21.11
-- Fabric Loader 0.16.14 or newer
-- Fabric API
-- Java 21
+
+- Minecraft Java Edition 26.2
+- Java 25
+- One of:
+  - Fabric Loader 0.19.3 or newer plus Fabric API
+  - Forge 26.2-65.1.3 or compatible
+  - NeoForge 26.2.0.75 or compatible
+
+The mod is client-only. It does not need to be installed on a server.
 
 ## Installation
-1. Install Fabric Loader for Minecraft 1.21.11.
-2. Install Fabric API.
-3. Download the mod jar from the releases you build or publish.
-4. Place the jar in your Minecraft `mods` folder.
-5. Launch the game with the Fabric profile.
 
-## Building from source
-1. Clone this repository.
-2. Open the project in a Java 21 environment.
-3. Run `gradlew build` on Windows or `./gradlew build` on Linux or macOS.
-4. Find the built jar in `build/libs`.
+Download the jar matching your loader and copy it into that profile's `mods` directory. Do not install more than one loader jar in the same profile.
 
-## Notes
-- This mod is client-side.
-- Servers do not need to install it.
-- The mod focuses on visual animation only and should preserve normal vanilla interaction behavior.
+Release filenames use this format:
+
+```text
+seamless-block-animations-2.0.0+mc26.2-fabric.jar
+seamless-block-animations-2.0.0+mc26.2-forge.jar
+seamless-block-animations-2.0.0+mc26.2-neoforge.jar
+```
+
+## Building and testing
+
+Use Java 25 and the included Gradle wrapper:
+
+```text
+./gradlew clean check build
+```
+
+The loader jars are written to `fabric/build/libs`, `forge/build/libs`, and `neoforge/build/libs`. The Fabric end-to-end client test creates a real world, animates all three block families, tests a rapid reversal, and captures screenshots:
+
+```text
+./gradlew :fabric:runClientGameTest
+```
+
+Screenshots are written to `fabric/build/run/clientGameTest/screenshots`.
+
+See [PORTING.md](PORTING.md) for the module boundaries and [MIGRATION.md](MIGRATION.md) for compatibility details.
 
 ## License
-This project is licensed under CC0-1.0.
+
+This project remains licensed under CC0-1.0.
