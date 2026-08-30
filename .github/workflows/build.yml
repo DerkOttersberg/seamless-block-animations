@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: [main, 'port/**', 'support/**']
+    branches: [main, 'port/**', 'support/**', 'feat/**', 'fix/**', 'release/**']
   pull_request:
 
 permissions:
